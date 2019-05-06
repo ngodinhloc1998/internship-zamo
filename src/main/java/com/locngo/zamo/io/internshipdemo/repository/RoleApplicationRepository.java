@@ -7,5 +7,5 @@ public interface RoleApplicationRepository extends JpaRepository<RoleApplication
     public RoleApplication findRoleByName(String name);
     public void deleteRoleByName(String name);
     public boolean existsRoleById(Long id);
-    public boolean existsRoleByName(String name);
+    public boolean existsRoleApplicationByName(String name);
 }

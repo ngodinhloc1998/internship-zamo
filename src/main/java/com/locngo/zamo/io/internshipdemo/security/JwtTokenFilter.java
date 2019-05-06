@@ -4,10 +4,13 @@ import com.locngo.zamo.io.internshipdemo.security.sercurityinterface.JwtTokenPro
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.data.repository.cdi.Eager;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
@@ -21,16 +24,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@Component
-@Lazy
+@ComponentScan(basePackageClasses = {JwtTokenProviderImpl.class})
 public class JwtTokenFilter extends OncePerRequestFilter {
 
+    @Autowired
     private JwtTokenProvider jwtTokenProvider;
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest, HttpServletResponse httpServletResponse, FilterChain filterChain) throws ServletException, IOException {
-
+        if(jwtTokenProvider == null){
+            SpringBeanAutowiringSupport.processInjectionBasedOnServletContext(this,httpServletRequest.getSession().getServletContext());
+        }
+        System.out.println(jwtTokenProvider);
         String token = jwtTokenProvider.resolveToken(httpServletRequest);
+        System.out.println("Value of token is " + token);
         try{
             if(token != null && jwtTokenProvider.validateToken(token)){
                 Authentication authentication = jwtTokenProvider.getAuthentication(token);
@@ -44,14 +51,4 @@ public class JwtTokenFilter extends OncePerRequestFilter {
         }
     }
 
-    @Override
-    @PostConstruct
-    protected void initFilterBean() throws ServletException {
-        WebApplicationContext context = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-        jwtTokenProvider = (JwtTokenProvider) context.getBean(JwtTokenProvider.class);
-        if(jwtTokenProvider == null){
-            System.out.println("JwtTokenProvider is null duma");
-            return;
-        }
-    }
 }

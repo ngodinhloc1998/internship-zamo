@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -36,7 +37,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
     private UserApplicationRepository userApplicationRepository;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private PasswordEncoder passwordEncoder;
 
     @Autowired
     @Qualifier("RoleApplicationServiceImpl")
@@ -66,7 +67,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
                     throw new RuntimeException("This user was exist!");
                 }
             }
-            userApplication.setPassword(bCryptPasswordEncoder.encode(userApplication.getPassword()));
+            userApplication.setPassword(passwordEncoder.encode(userApplication.getPassword()));
             userApplication.getUserRole().add(userRoleService.createNewUserRole(userApplication.getUsername(),BaseRoleConst.ROLE_ADMIN));
             return userApplicationRepository.save(userApplication);
         }
@@ -77,7 +78,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
     public UserApplication updateUser(UserApplication userApplication) {
         if(userApplication != null && userApplicationRepository.existsUserApplicationByUsername(userApplication.getUsername())){
             userApplication.setId(userApplicationRepository.findUserApplicationsByUsername(userApplication.getUsername()).getId());
-            userApplication.setPassword(bCryptPasswordEncoder.encode(userApplication.getPassword()));
+            userApplication.setPassword(passwordEncoder.encode(userApplication.getPassword()));
             return userApplicationRepository.save(userApplication);
         }
         return null;
@@ -85,7 +86,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
 
     @Override
     public UserApplication addNewRole(String username, String roleName) {
-        if(userApplicationRepository.existsUserApplicationByUsername(username) && roleApplicationRepository.existsRoleByName(roleName)) {
+        if(userApplicationRepository.existsUserApplicationByUsername(username) && roleApplicationService.existRoleApplicationByName(roleName)) {
             if (!getRolesByUsername(username).contains(roleApplicationService.getRoleByName(roleName))) {
                 UserApplication userApplication = userApplicationRepository.findUserApplicationsByUsername(username);
                 userApplication.getUserRole().add(userRoleService.createNewUserRole(username, roleName));
@@ -121,7 +122,11 @@ public class UserApplicationServiceImpl implements UserApplicationService{
     @Override
     public String signin(String username, String password) {
         try{
-            password = bCryptPasswordEncoder.encode(password);
+//            System.out.println("Original Password " + password);
+//            //password = passwordEncoder.encode(password);
+//            System.out.println("Password Encoded 1 " + password);
+//            //password = passwordEncoder.encode(password);
+//            System.out.println("Password Encoded 2 " + password);
             authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username,password));
             return jwtTokenProvider.createToken(username);
         }catch (AuthenticationException e){
@@ -131,8 +136,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
 
     @Override
     public String signup(UserApplication userApplication) {
-        userApplication = createNewUser(userApplication);
-        return jwtTokenProvider.createToken(userApplication.getUsername());
+        return jwtTokenProvider.createToken(createNewUser(userApplication).getUsername());
     }
 
     @Override
@@ -172,6 +176,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
         if(userApplication == null){
             throw new RuntimeException("User '" + username + "' not found!");
         }
+        System.out.println("Result Check Password: " + passwordEncoder.matches("123456",userApplication.getPassword()));
         return User.withUsername(userApplication.getUsername())
                 .password(userApplication.getPassword())
                 .authorities(getRolesByUsername(userApplication.getUsername()))

@@ -10,4 +10,5 @@ public interface RoleApplicationService {
     public RoleApplication getRole(Long id);
     public RoleApplication getRoleByName(String name);
     public List<RoleApplication> getRoles();
+    public boolean existRoleApplicationByName(String name);
 }

@@ -5,9 +5,11 @@ import com.locngo.zamo.io.internshipdemo.model.RoleApplication;
 import com.locngo.zamo.io.internshipdemo.service.serviceinterface.UserApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -78,9 +80,23 @@ public class ApplicationUserController {
     String signin(@RequestBody Map<String,String> userInfo){
         String username = userInfo.get("username");
         String password = userInfo.get("password");
+        printBean();
         return userApplicationService.signin(username,password);
     }
 
 
+    /**
+     * print all Bean
+     */
+
+    @Autowired
+    ApplicationContext applicationContext;
+
+    public void printBean(){
+        List listBean = Arrays.asList(applicationContext.getBeanDefinitionNames());
+        for(Object bean: listBean){
+            System.out.println(bean);
+        }
+    }
 
 }

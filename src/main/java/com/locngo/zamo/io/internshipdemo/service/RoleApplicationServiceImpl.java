@@ -27,7 +27,7 @@ public class RoleApplicationServiceImpl implements RoleApplicationService {
     public RoleApplication createNewRole(RoleApplication roleApplication) {
         if(roleApplication != null){
             if(roleApplicationRepository.findAll() != null || roleApplicationRepository.findAll().size() == 0){
-                if(roleApplicationRepository.existsRoleByName(roleApplication.getName())){
+                if(roleApplicationRepository.existsRoleApplicationByName(roleApplication.getName())){
                     throw new RuntimeException("This role was exist!");
                 }
             }
@@ -39,7 +39,7 @@ public class RoleApplicationServiceImpl implements RoleApplicationService {
 
     @Override
     public RoleApplication updateRole(RoleApplication roleApplication) {
-        if(roleApplication != null && roleApplicationRepository.existsRoleByName(roleApplication.getName())){
+        if(roleApplication != null && roleApplicationRepository.existsRoleApplicationByName(roleApplication.getName())){
             roleApplication.setId(roleApplicationRepository.findRoleByName(roleApplication.getName()).getId());
             return roleApplicationRepository.save(roleApplication);
         }else{
@@ -61,5 +61,10 @@ public class RoleApplicationServiceImpl implements RoleApplicationService {
     @Override
     public List<RoleApplication> getRoles() {
         return roleApplicationRepository.findAll();
+    }
+
+    @Override
+    public boolean existRoleApplicationByName(String name) {
+        return roleApplicationRepository.existsRoleApplicationByName(name);
     }
 }
