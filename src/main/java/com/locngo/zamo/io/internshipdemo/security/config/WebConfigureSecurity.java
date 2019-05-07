@@ -1,12 +1,11 @@
 package com.locngo.zamo.io.internshipdemo.security.config;
 
-import com.locngo.zamo.io.internshipdemo.security.JwtTokenFilterConfigurer;
-import com.locngo.zamo.io.internshipdemo.security.JwtTokenProviderImpl;
-import com.locngo.zamo.io.internshipdemo.security.sercurityinterface.JwtTokenProvider;
+import com.locngo.zamo.io.internshipdemo.security.jwt.impl.JwtTokenFilterConfigurer;
+import com.locngo.zamo.io.internshipdemo.security.jwt.impl.JwtTokenProviderImpl;
+import com.locngo.zamo.io.internshipdemo.security.jwt.jwtinterface.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;

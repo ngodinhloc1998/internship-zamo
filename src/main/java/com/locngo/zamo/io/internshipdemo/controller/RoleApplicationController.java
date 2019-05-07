@@ -1,7 +1,7 @@
 package com.locngo.zamo.io.internshipdemo.controller;
 
-import com.locngo.zamo.io.internshipdemo.model.RoleApplication;
-import com.locngo.zamo.io.internshipdemo.service.serviceinterface.RoleApplicationService;
+import com.locngo.zamo.io.internshipdemo.model.roleapplication.RoleApplication;
+import com.locngo.zamo.io.internshipdemo.service.roleapplication.service.RoleApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.bind.annotation.*;

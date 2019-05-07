@@ -1,15 +1,22 @@
 package com.locngo.zamo.io.internshipdemo.controller;
 
-import com.locngo.zamo.io.internshipdemo.model.UserApplication;
-import com.locngo.zamo.io.internshipdemo.model.RoleApplication;
-import com.locngo.zamo.io.internshipdemo.service.serviceinterface.UserApplicationService;
+import com.locngo.zamo.io.internshipdemo.model.userapplication.UserApplication;
+import com.locngo.zamo.io.internshipdemo.model.roleapplication.RoleApplication;
+import com.locngo.zamo.io.internshipdemo.model.usersecurity.MyUserPrinciple;
+import com.locngo.zamo.io.internshipdemo.service.userapplication.service.UserApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -21,7 +28,7 @@ public class ApplicationUserController {
     private UserApplicationService userApplicationService;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    private MyUserPrinciple myUserPrinciple;
 
     @RequestMapping(value = {"/apis/users"}, method = RequestMethod.POST)
     public @ResponseBody
@@ -84,6 +91,26 @@ public class ApplicationUserController {
         return userApplicationService.signin(username,password);
     }
 
+    @RequestMapping(value = "/apis/users/details/{username}",method = RequestMethod.GET)
+    public @ResponseBody
+    UserDetails getUserDetails(@PathVariable("username") String username){
+       return myUserPrinciple.loadUserByUsername(username);
+    }
+
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
+    @RequestMapping(value = "/apis/users/test/author-admin", method = RequestMethod.GET)
+    public @ResponseBody
+    String helloAdmin(){
+        Collection<SimpleGrantedAuthority> authentication = (Collection<SimpleGrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
+        System.out.println(Arrays.toString(authentication.toArray()));
+        return "Hello Admin";
+    }
+
+    @RequestMapping(value = "/apis/users/names-role/{username}",method = RequestMethod.GET)
+    public @ResponseBody
+    List<String> getNamesRole(@PathVariable String username){
+        return userApplicationService.getNamesRoleAppicationByUsername(username);
+    }
 
     /**
      * print all Bean
