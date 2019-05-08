@@ -1,27 +1,29 @@
 package com.locngo.zamo.io.internshipdemo.exception;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.springframework.http.HttpStatus;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
-public class APIException {
+public class APIException{
 
+    @JsonFormat(shape = JsonFormat.Shape.STRING,pattern = "dd-MM-yy hh:mm:ss")
+    private LocalDateTime timeError;
     private HttpStatus httpStatus;
     private String message;
-    private List<String> errors;
 
-    public APIException(HttpStatus httpStatus, String message, List<String> errors) {
-        this.httpStatus = httpStatus;
-        this.message = message;
-        this.errors = errors;
+    public APIException() {
+        this.timeError = LocalDateTime.now();
     }
 
-    public APIException(HttpStatus httpStatus, String message, String error) {
+    public APIException(HttpStatus httpStatus, String message) {
+        this.timeError = LocalDateTime.now();
         this.httpStatus = httpStatus;
         this.message = message;
-        this.errors = Arrays.asList(error);
     }
 
     public HttpStatus getHttpStatus() {
@@ -40,11 +42,11 @@ public class APIException {
         this.message = message;
     }
 
-    public List<String> getErrors() {
-        return errors;
+    public LocalDateTime getTimeError() {
+        return timeError;
     }
 
-    public void setErrors(List<String> errors) {
-        this.errors = errors;
+    public void setTimeError(LocalDateTime timeError) {
+        this.timeError = timeError;
     }
 }

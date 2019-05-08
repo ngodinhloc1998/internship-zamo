@@ -1,5 +1,8 @@
 package com.locngo.zamo.io.internshipdemo.controller;
 
+import com.locngo.zamo.io.internshipdemo.exception.APIException;
+import com.locngo.zamo.io.internshipdemo.exception.CustomRestExceptionHandler;
+import com.locngo.zamo.io.internshipdemo.exception.TestException;
 import com.locngo.zamo.io.internshipdemo.model.userapplication.UserApplication;
 import com.locngo.zamo.io.internshipdemo.model.roleapplication.RoleApplication;
 import com.locngo.zamo.io.internshipdemo.model.usersecurity.MyUserPrinciple;
@@ -7,9 +10,9 @@ import com.locngo.zamo.io.internshipdemo.service.userapplication.service.UserApp
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,14 +33,17 @@ public class ApplicationUserController {
     @Autowired
     private MyUserPrinciple myUserPrinciple;
 
+    @PreAuthorize("hasAuthority('ADMIN')")
     @RequestMapping(value = {"/apis/users"}, method = RequestMethod.POST)
     public @ResponseBody
     UserApplication createUser(@RequestBody UserApplication userApplication){
-        try {
-            return userApplicationService.createNewUser(userApplication);
-        }catch (Exception e){
-            throw new RuntimeException(e.getMessage());
-        }
+        return userApplicationService.createNewUser(userApplication);
+    }
+
+    @RequestMapping(value = "/apis/users/signup",method = RequestMethod.POST)
+    public @ResponseBody
+    String signup(@RequestBody UserApplication userApplication){
+        return userApplicationService.signup(userApplication);
     }
 
     @RequestMapping(value = {"/apis/users/{id}"}, method = RequestMethod.GET)
@@ -110,6 +116,13 @@ public class ApplicationUserController {
     public @ResponseBody
     List<String> getNamesRole(@PathVariable String username){
         return userApplicationService.getNamesRoleAppicationByUsername(username);
+    }
+
+
+    @RequestMapping(value = "/test-exception",method = RequestMethod.GET)
+    public @ResponseBody
+    String testExceptionHandler(){
+        throw new TestException();
     }
 
     /**

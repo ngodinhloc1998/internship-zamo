@@ -1,5 +1,6 @@
 package com.locngo.zamo.io.internshipdemo.service.userapplication.impl;
 
+import com.locngo.zamo.io.internshipdemo.exception.userapplication.*;
 import com.locngo.zamo.io.internshipdemo.model.userapplication.UserApplication;
 import com.locngo.zamo.io.internshipdemo.model.roleapplication.RoleApplication;
 import com.locngo.zamo.io.internshipdemo.repository.userapplication.RoleApplicationRepository;
@@ -15,13 +16,9 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.Role;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
@@ -60,16 +57,40 @@ public class UserApplicationServiceImpl implements UserApplicationService{
     @Qualifier("SecurityAuthenticationManage")
     private AuthenticationManager authenticationManager;
 
+
+    private boolean checkValidateAccount(UserApplication userApplication){
+        if(userApplication == null){
+            throw new UserApplicationNullException();
+        }
+        if(userApplication.getUsername() == null || userApplication.getPassword() == null
+        || userApplication.getEmail() == null || userApplication.getName() == null){
+            throw new NotEnoughUserFieldException();
+        }
+        if(userApplication.getUsername().equals("")){
+            throw new UsernameCanNotBeEmptyException();
+        }
+        if(userApplication.getPassword().equals("")){
+            throw new PasswordCanNotBeEmptyException();
+        }
+        if(userApplication.getEmail().equals("")){
+            throw new EmailCanNotBeEmptyException();
+        }
+        if (userApplication.getName().equals("")){
+            throw new NameCanNotBeEmptyException();
+        }
+        if (userApplicationRepository.findAll() != null
+                || userApplicationRepository.findAll().size() > 0
+        ){
+            if(userApplicationRepository.existsUserApplicationByUsername(userApplication.getUsername())){
+                throw new UsernameWasExistException(userApplication.getUsername());
+            }
+        }
+        return true;
+    }
+
     @Override
     public UserApplication createNewUser(UserApplication userApplication) {
-        if(userApplication != null){
-            if (userApplicationRepository.findAll() != null
-                || userApplicationRepository.findAll().size() > 0
-            ){
-                if(userApplicationRepository.existsUserApplicationByUsername(userApplication.getUsername())){
-                    throw new RuntimeException("This user was exist!");
-                }
-            }
+        if(checkValidateAccount(userApplication)){
             userApplication.setPassword(passwordEncoder.encode(userApplication.getPassword()));
             userApplicationRepository.save(userApplication);
             userApplication.getUserRole().add(userRoleService.createNewUserRole(userApplication.getUsername(), BaseRoleConst.ROLE_USER));
@@ -78,9 +99,11 @@ public class UserApplicationServiceImpl implements UserApplicationService{
         return null;
     }
 
+    //Done
+
     @Override
     public UserApplication updateUser(UserApplication userApplication) {
-        if(userApplication != null && userApplicationRepository.existsUserApplicationByUsername(userApplication.getUsername())){
+        if(checkValidateAccount(userApplication)){
             userApplication.setId(userApplicationRepository.findUserApplicationsByUsername(userApplication.getUsername()).getId());
             userApplication.setPassword(passwordEncoder.encode(userApplication.getPassword()));
             return userApplicationRepository.save(userApplication);
