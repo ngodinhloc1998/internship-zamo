@@ -2,14 +2,19 @@ com/locngo/zamo/io/internshipdemo/exception/TestException.class
 com/locngo/zamo/io/internshipdemo/service/roleapplication/impl/UserRoleServiceImpl.class
 com/locngo/zamo/io/internshipdemo/repository/userapplication/RoleApplicationRepository.class
 com/locngo/zamo/io/internshipdemo/service/roleapplication/impl/RoleApplicationServiceImpl.class
+com/locngo/zamo/io/internshipdemo/exception/roleapplication/RoleIsNullException.class
 com/locngo/zamo/io/internshipdemo/model/roleapplication/RoleApplication.class
 com/locngo/zamo/io/internshipdemo/controller/RoleApplicationController.class
 com/locngo/zamo/io/internshipdemo/service/userapplication/impl/UserApplicationServiceImpl.class
 com/locngo/zamo/io/internshipdemo/config/AppInitializer.class
 com/locngo/zamo/io/internshipdemo/security/jwt/impl/JwtTokenFilter.class
+com/locngo/zamo/io/internshipdemo/exception/roleapplication/CanNotFoundRoleByNameException.class
 com/locngo/zamo/io/internshipdemo/exception/userapplication/UsernameCanNotBeEmptyException.class
+com/locngo/zamo/io/internshipdemo/exception/userapplication/UserNotExistException.class
 com/locngo/zamo/io/internshipdemo/repository/userapplication/UserRoleRepository.class
 com/locngo/zamo/io/internshipdemo/exception/userapplication/UserApplicationNullException.class
+com/locngo/zamo/io/internshipdemo/exception/roleapplication/RoleWasExistedInUserException.class
+com/locngo/zamo/io/internshipdemo/exception/jwt/InvalidTokenException.class
 com/locngo/zamo/io/internshipdemo/exception/userapplication/EmailCanNotBeEmptyException.class
 com/locngo/zamo/io/internshipdemo/InternshipDemoApplication.class
 com/locngo/zamo/io/internshipdemo/exception/APIException.class
@@ -18,6 +23,7 @@ com/locngo/zamo/io/internshipdemo/security/config/WebConfigureSecurity.class
 com/locngo/zamo/io/internshipdemo/service/roleapplication/service/UserRoleService.class
 com/locngo/zamo/io/internshipdemo/exception/userapplication/PasswordCanNotBeEmptyException.class
 com/locngo/zamo/io/internshipdemo/service/userapplication/service/UserApplicationService.class
+com/locngo/zamo/io/internshipdemo/exception/userapplication/CanNotFoundUserByUsernameException.class
 com/locngo/zamo/io/internshipdemo/exception/userapplication/UsernameWasExistException.class
 com/locngo/zamo/io/internshipdemo/exception/userapplication/NotEnoughUserFieldException.class
 com/locngo/zamo/io/internshipdemo/exception/userapplication/NameCanNotBeEmptyException.class
@@ -32,5 +38,7 @@ com/locngo/zamo/io/internshipdemo/security/jwt/jwtinterface/JwtTokenProvider.cla
 com/locngo/zamo/io/internshipdemo/repository/roleapplication/UserApplicationRepository.class
 com/locngo/zamo/io/internshipdemo/controller/ApplicationUserController.class
 com/locngo/zamo/io/internshipdemo/exception/CustomRestExceptionHandler.class
+com/locngo/zamo/io/internshipdemo/exception/roleapplication/RoleNotExistException.class
 com/locngo/zamo/io/internshipdemo/security/config/BcryptEncodeConfig.class
+com/locngo/zamo/io/internshipdemo/exception/roleapplication/RoleNameWasExistException.class
 com/locngo/zamo/io/internshipdemo/service/roleapplication/service/RoleApplicationService.class

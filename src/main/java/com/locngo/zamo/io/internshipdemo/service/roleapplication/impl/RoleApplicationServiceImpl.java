@@ -1,6 +1,8 @@
 package com.locngo.zamo.io.internshipdemo.service.roleapplication.impl;
 
 
+import com.locngo.zamo.io.internshipdemo.exception.roleapplication.RoleIsNullException;
+import com.locngo.zamo.io.internshipdemo.exception.roleapplication.RoleNameWasExistException;
 import com.locngo.zamo.io.internshipdemo.model.roleapplication.RoleApplication;
 import com.locngo.zamo.io.internshipdemo.repository.userapplication.RoleApplicationRepository;
 import com.locngo.zamo.io.internshipdemo.service.roleapplication.service.RoleApplicationService;
@@ -27,12 +29,12 @@ public class RoleApplicationServiceImpl implements RoleApplicationService {
         if(roleApplication != null){
             if(roleApplicationRepository.findAll() != null || roleApplicationRepository.findAll().size() == 0){
                 if(roleApplicationRepository.existsRoleApplicationByName(roleApplication.getName())){
-                    throw new RuntimeException("This role was exist!");
+                    throw new RoleNameWasExistException(roleApplication.getName());
                 }
             }
             return roleApplicationRepository.save(roleApplication);
         }else{
-            throw new RuntimeException("Invalid Input Role!");
+            throw new RoleIsNullException();
         }
     }
 
@@ -42,7 +44,7 @@ public class RoleApplicationServiceImpl implements RoleApplicationService {
             roleApplication.setId(roleApplicationRepository.findRoleByName(roleApplication.getName()).getId());
             return roleApplicationRepository.save(roleApplication);
         }else{
-            throw new RuntimeException("Invalid Input Role!");
+            throw new RoleIsNullException();
         }
     }
 

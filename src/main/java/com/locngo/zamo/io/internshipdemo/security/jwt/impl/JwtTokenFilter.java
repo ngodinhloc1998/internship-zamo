@@ -1,5 +1,6 @@
 package com.locngo.zamo.io.internshipdemo.security.jwt.impl;
 
+import com.locngo.zamo.io.internshipdemo.exception.jwt.InvalidTokenException;
 import com.locngo.zamo.io.internshipdemo.security.config.WebConfigureSecurity;
 import com.locngo.zamo.io.internshipdemo.security.jwt.jwtinterface.JwtTokenProvider;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +39,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             }
         }catch (Exception e){
             SecurityContextHolder.clearContext();
-            System.out.println("Token is invalid!(at JwtTokenFilter)");
+            System.out.println("Expired or invalid token!");
             return;
-        }finally {
-            filterChain.doFilter(httpServletRequest,httpServletResponse);
         }
+        filterChain.doFilter(httpServletRequest,httpServletResponse);
     }
 
 }

@@ -1,5 +1,7 @@
 package com.locngo.zamo.io.internshipdemo.service.userapplication.impl;
 
+import com.locngo.zamo.io.internshipdemo.exception.roleapplication.RoleNotExistException;
+import com.locngo.zamo.io.internshipdemo.exception.roleapplication.RoleWasExistedInUserException;
 import com.locngo.zamo.io.internshipdemo.exception.userapplication.*;
 import com.locngo.zamo.io.internshipdemo.model.userapplication.UserApplication;
 import com.locngo.zamo.io.internshipdemo.model.roleapplication.RoleApplication;
@@ -16,6 +18,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -58,7 +61,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
     private AuthenticationManager authenticationManager;
 
 
-    private boolean checkValidateAccount(UserApplication userApplication){
+    private boolean validateAccount(UserApplication userApplication){
         if(userApplication == null){
             throw new UserApplicationNullException();
         }
@@ -88,9 +91,30 @@ public class UserApplicationServiceImpl implements UserApplicationService{
         return true;
     }
 
+    private boolean validateUsername(String username){
+        if(!userApplicationRepository.existsUserApplicationByUsername(username)){
+            throw new CanNotFoundUserByUsernameException(username);
+        }
+        return true;
+    }
+
+    public boolean validateRoleName(String name){
+        if(!roleApplicationRepository.existsRoleApplicationByName(name)){
+            throw new RoleNotExistException(name);
+        }
+        return true;
+    }
+
+    private boolean checkRoleWasContainedByUser(String username,String roleName){
+        if(getRolesByUsername(username).contains(roleApplicationService.getRoleByName(roleName))){
+            throw new RoleWasExistedInUserException(username,roleName);
+        }
+        return true;
+    }
+
     @Override
     public UserApplication createNewUser(UserApplication userApplication) {
-        if(checkValidateAccount(userApplication)){
+        if(validateAccount(userApplication)){
             userApplication.setPassword(passwordEncoder.encode(userApplication.getPassword()));
             userApplicationRepository.save(userApplication);
             userApplication.getUserRole().add(userRoleService.createNewUserRole(userApplication.getUsername(), BaseRoleConst.ROLE_USER));
@@ -103,7 +127,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
 
     @Override
     public UserApplication updateUser(UserApplication userApplication) {
-        if(checkValidateAccount(userApplication)){
+        if(validateAccount(userApplication)){
             userApplication.setId(userApplicationRepository.findUserApplicationsByUsername(userApplication.getUsername()).getId());
             userApplication.setPassword(passwordEncoder.encode(userApplication.getPassword()));
             return userApplicationRepository.save(userApplication);
@@ -113,8 +137,8 @@ public class UserApplicationServiceImpl implements UserApplicationService{
 
     @Override
     public UserApplication addNewRole(String username, String roleName) {
-        if(userApplicationRepository.existsUserApplicationByUsername(username) && roleApplicationService.existRoleApplicationByName(roleName)) {
-            if (!getRolesByUsername(username).contains(roleApplicationService.getRoleByName(roleName))) {
+        if(validateUsername(username) && validateRoleName(roleName)) {
+            if (checkRoleWasContainedByUser(username,roleName)) {
                 UserApplication userApplication = userApplicationRepository.findUserApplicationsByUsername(username);
                 userApplication.getUserRole().add(userRoleService.createNewUserRole(username, roleName));
                 return userApplicationRepository.save(userApplication);
@@ -133,8 +157,9 @@ public class UserApplicationServiceImpl implements UserApplicationService{
         UserApplication userApplication = userApplicationRepository.findUserApplicationsByUsername(username);
         if(userApplication != null){
             return userApplication;
+        }else{
+            throw new UsernameNotFoundException(username);
         }
-        return null;
     }
 
     @Override
@@ -168,7 +193,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
 
     @Override
     public List<RoleApplication> getRolesByUsername(String username) {
-        if(userApplicationRepository.existsUserApplicationByUsername(username)){
+        if(validateUsername(username)){
             EntityManager entityManager = entityManagerFactory.createEntityManager();
             List<RoleApplication> roles = (List<RoleApplication>)entityManager.createQuery("SELECT r FROM RoleApplication r JOIN r.userRole rru JOIN rru.userApplication u " +
                     "WHERE u.username=:username").setParameter("username",username).getResultList();
@@ -204,7 +229,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
 
     @Override
     public List<String> getNamesRoleAppicationByUsername(String username) {
-        if(userApplicationRepository.existsUserApplicationByUsername(username)){
+        if(validateUsername(username)){
             EntityManager entityManager = entityManagerFactory.createEntityManager();
             List<String> namesRole = (List<String>) entityManager.createQuery(
                     "SELECT r.name FROM RoleApplication r JOIN r.userRole ur JOIN ur.userApplication u WHERE u.username = :username"
@@ -216,7 +241,7 @@ public class UserApplicationServiceImpl implements UserApplicationService{
 
     @Override
     public List<SimpleGrantedAuthority> getGrantedAuthorityByUsername(String username) {
-        if(userApplicationRepository.existsUserApplicationByUsername(username)){
+        if(validateUsername(username)){
             EntityManager entityManager = entityManagerFactory.createEntityManager();
             List<RoleApplication> namesRole = (List<RoleApplication>) entityManager.createQuery(
                     "SELECT r FROM RoleApplication r JOIN r.userRole ur JOIN ur.userApplication u WHERE u.username = :username"

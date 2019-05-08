@@ -7,6 +7,7 @@ import com.locngo.zamo.io.internshipdemo.service.userapplication.service.UserApp
 import com.locngo.zamo.io.internshipdemo.service.roleapplication.service.UserRoleService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -31,7 +32,7 @@ public class UserRoleServiceImpl implements UserRoleService {
             userRole.setRoleApplication(roleApplicationService.getRoleByName(roleName));
             return userRoleRepository.save(userRole);
         }else{
-            throw new RuntimeException("Can't create instance UserRole!");
+            throw new UsernameNotFoundException(username);
         }
     }
 }

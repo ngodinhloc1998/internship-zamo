@@ -1,5 +1,7 @@
 package com.locngo.zamo.io.internshipdemo.exception;
 
+import com.locngo.zamo.io.internshipdemo.exception.jwt.InvalidTokenException;
+import com.locngo.zamo.io.internshipdemo.exception.roleapplication.*;
 import com.locngo.zamo.io.internshipdemo.exception.userapplication.*;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
@@ -10,9 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
-import javax.servlet.http.HttpServletResponse;
-import javax.swing.tree.ExpandVetoException;
-import java.io.IOException;
+
 import java.util.Map;
 
 @RestControllerAdvice
@@ -78,6 +78,71 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(NotEnoughUserFieldException.class)
     public ResponseEntity<APIException> handleNotEnoughFileUserException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(UserNotExistException.class)
+    public ResponseEntity<APIException> handleUserNotExistException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(RoleNotExistException.class)
+    public ResponseEntity<APIException> handleRoleNotExistException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(CanNotFoundUserByUsernameException.class)
+    public ResponseEntity<APIException> handleCanNotFoundUserByUsernameException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(CanNotFoundRoleByNameException.class)
+    public ResponseEntity<APIException> handleCanNotFoundRoleByNameException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(RoleWasExistedInUserException.class)
+    public ResponseEntity<APIException> handleRoleWasExistedInUserException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+
+    @ExceptionHandler(RoleNameWasExistException.class)
+    public ResponseEntity<APIException> handleRoleNameWasExistException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(RoleIsNullException.class)
+    public ResponseEntity<APIException> handleRoleIsNullException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<APIException> handleInvalidTokenException(Exception exception){
         APIException apiException = new APIException();
         apiException.setMessage(exception.getMessage());
         apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
