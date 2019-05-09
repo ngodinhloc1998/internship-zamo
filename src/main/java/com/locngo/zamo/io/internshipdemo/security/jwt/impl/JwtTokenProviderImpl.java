@@ -106,5 +106,13 @@ public class JwtTokenProviderImpl implements JwtTokenProvider{
         return Jwts.parser().setSigningKey(SECRET_KEY).parse(token).getBody().toString();
     }
 
+    @Override
+    public String resolveTokenFromHeader(String header) {
+        if(header != null && header.startsWith(TOKEN_PREFIX)){
+            return header.substring(7);
+        }
+        return null;
+    }
+
 
 }

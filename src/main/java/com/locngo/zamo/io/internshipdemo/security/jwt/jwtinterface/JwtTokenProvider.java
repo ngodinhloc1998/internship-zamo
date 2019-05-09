@@ -12,5 +12,5 @@ public interface JwtTokenProvider extends SecurityConfigConst {
     public String resolveToken(HttpServletRequest request);
     public boolean validateToken(String token);
     public String getBodyFromToken(String token);
-
+    public String resolveTokenFromHeader(String header);
 }

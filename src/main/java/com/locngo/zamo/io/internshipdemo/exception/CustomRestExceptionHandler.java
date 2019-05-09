@@ -1,8 +1,10 @@
 package com.locngo.zamo.io.internshipdemo.exception;
 
+import com.locngo.zamo.io.internshipdemo.exception.course.*;
 import com.locngo.zamo.io.internshipdemo.exception.jwt.InvalidTokenException;
 import com.locngo.zamo.io.internshipdemo.exception.roleapplication.*;
 import com.locngo.zamo.io.internshipdemo.exception.userapplication.*;
+import com.locngo.zamo.io.internshipdemo.exception.usercourse.CanNotFoundUserCourseException;
 import org.springframework.boot.web.servlet.error.DefaultErrorAttributes;
 import org.springframework.boot.web.servlet.error.ErrorAttributes;
 import org.springframework.context.annotation.Bean;
@@ -143,6 +145,70 @@ public class CustomRestExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(InvalidTokenException.class)
     public ResponseEntity<APIException> handleInvalidTokenException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(CourseFieldNotEnoughException.class)
+    public ResponseEntity<APIException> handleCourseFieldNotEnoughException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(CourseNameNotBeEmptyException.class)
+    public ResponseEntity<APIException> handleCourseNameNotBeEmptyException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(InvalidInputException.class)
+    public ResponseEntity<APIException> handleInvalidInputException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(CanNotFoundCourseException.class)
+    public ResponseEntity<APIException> handleCanNotFoundCourseException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(CanNotFoundCourseByIdException.class)
+    public ResponseEntity<APIException> handleCanNotFoundCourseByIdException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(CourseNameExistedException.class)
+    public ResponseEntity<APIException> handleCourseNameExistedException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(AccessPermissionDeniedException.class)
+    public ResponseEntity<APIException> handleAccessPermissionDeniedException(Exception exception){
+        APIException apiException = new APIException();
+        apiException.setMessage(exception.getMessage());
+        apiException.setHttpStatus(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(apiException,apiException.getHttpStatus());
+    }
+
+    @ExceptionHandler(CanNotFoundUserCourseException.class)
+    public ResponseEntity<APIException> handleCanNotFoundUserCourseException(Exception exception){
         APIException apiException = new APIException();
         apiException.setMessage(exception.getMessage());
         apiException.setHttpStatus(HttpStatus.BAD_REQUEST);

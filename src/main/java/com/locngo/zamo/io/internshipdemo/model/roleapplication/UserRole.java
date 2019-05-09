@@ -2,6 +2,7 @@ package com.locngo.zamo.io.internshipdemo.model.roleapplication;
 
 import com.locngo.zamo.io.internshipdemo.model.roleapplication.RoleApplication;
 import com.locngo.zamo.io.internshipdemo.model.userapplication.UserApplication;
+import lombok.Data;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;

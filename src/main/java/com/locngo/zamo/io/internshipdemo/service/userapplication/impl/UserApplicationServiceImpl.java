@@ -1,13 +1,21 @@
 package com.locngo.zamo.io.internshipdemo.service.userapplication.impl;
 
+import com.locngo.zamo.io.internshipdemo.exception.course.CanNotFoundCourseException;
 import com.locngo.zamo.io.internshipdemo.exception.roleapplication.RoleNotExistException;
 import com.locngo.zamo.io.internshipdemo.exception.roleapplication.RoleWasExistedInUserException;
 import com.locngo.zamo.io.internshipdemo.exception.userapplication.*;
+import com.locngo.zamo.io.internshipdemo.exception.usercourse.CanNotFoundUserCourseException;
+import com.locngo.zamo.io.internshipdemo.model.course.Course;
 import com.locngo.zamo.io.internshipdemo.model.userapplication.UserApplication;
 import com.locngo.zamo.io.internshipdemo.model.roleapplication.RoleApplication;
+import com.locngo.zamo.io.internshipdemo.model.usercourse.UserCourse;
+import com.locngo.zamo.io.internshipdemo.repository.course.CourseRepository;
+import com.locngo.zamo.io.internshipdemo.repository.course.UserCourseRepository;
 import com.locngo.zamo.io.internshipdemo.repository.userapplication.RoleApplicationRepository;
 import com.locngo.zamo.io.internshipdemo.repository.roleapplication.UserApplicationRepository;
 import com.locngo.zamo.io.internshipdemo.security.jwt.jwtinterface.JwtTokenProvider;
+import com.locngo.zamo.io.internshipdemo.service.course.CourseService;
+import com.locngo.zamo.io.internshipdemo.service.course.UserCourseService;
 import com.locngo.zamo.io.internshipdemo.service.roleapplication.service.BaseRoleConst;
 import com.locngo.zamo.io.internshipdemo.service.userapplication.service.UserApplicationService;
 import com.locngo.zamo.io.internshipdemo.service.roleapplication.service.RoleApplicationService;
@@ -52,6 +60,18 @@ public class UserApplicationServiceImpl implements UserApplicationService{
 
     @Autowired
     private RoleApplicationRepository roleApplicationRepository;
+
+    @Autowired
+    private CourseRepository courseRepository;
+
+    @Autowired
+    private CourseService courseService;
+
+    @Autowired
+    private UserCourseService userCourseService;
+
+    @Autowired
+    private UserCourseRepository userCourseRepository;
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
@@ -110,6 +130,14 @@ public class UserApplicationServiceImpl implements UserApplicationService{
             throw new RoleWasExistedInUserException(username,roleName);
         }
         return true;
+    }
+
+    private boolean checkSelfOwner(String header,String username){
+        String token = jwtTokenProvider.resolveTokenFromHeader(header);
+        if(token != null && (jwtTokenProvider.getUsername(token).equals(username))){
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -252,4 +280,89 @@ public class UserApplicationServiceImpl implements UserApplicationService{
         }
         return null;
     }
+
+    @Override
+    public List<Course> addCourse(String username, String courseName, String header) {
+        if(checkSelfOwner(header,username)){
+            if(courseRepository.existsCourseByName(courseName)){
+                Course course = courseRepository.findCourseByName(courseName);
+                UserApplication userApplication = userApplicationRepository.findUserApplicationsByUsername(username);
+                userCourseService.addNewCourse(userApplication,course);
+                return getCourses(username,header);
+            }else {
+                throw new CanNotFoundCourseException(courseName);
+            }
+        }else{
+            throw new AccessPermissionDeniedException();
+        }
+    }
+
+    @Override
+    public UserCourse editCourse(String username, String courseName,UserCourse userCourse, String header) {
+        if(checkSelfOwner(header,username)){
+            UserCourse oldUserCourse = userCourseService.getUserCourse(username,courseName);
+            userCourse.setId(oldUserCourse.getId());
+            return userCourseRepository.save(userCourse);
+        }else{
+            throw new AccessPermissionDeniedException();
+        }
+    }
+
+    @Override
+    public List<Course> getCourses(String username, String header) {
+        if(checkSelfOwner(header,username)){
+            EntityManager entityManager = entityManagerFactory.createEntityManager();
+            List<Course> courses = (List<Course>) entityManager.createQuery("SELECT c from Course c" +
+                    " JOIN c.userCourses uc JOIN uc.userApplication u WHERE u.username=:username")
+                    .setParameter("username",username).getResultList();
+            return courses;
+        }else {
+            throw new AccessPermissionDeniedException();
+        }
+    }
+
+    @Override
+    public Course getCourseByName(String username, String courseName, String header) {
+        if(checkSelfOwner(header,username)){
+            EntityManager entityManager = entityManagerFactory.createEntityManager();
+            Course course = (Course)entityManager.createQuery("SELECT c FROM Course c" +
+                    " JOIN c.userCourses uc JOIN uc.userApplication u " +
+                    "WHERE u.username=:username AND c.name=:courseName").setParameter("username",username)
+                    .setParameter("courseName",courseName).getSingleResult();
+            return course;
+        }else {
+            throw new AccessPermissionDeniedException();
+        }
+    }
+
+    @Override
+    public void deleteCourse(String username, String courseName, String header) {
+
+    }
+
+    @Override
+    public UserCourse updateAmountCompleted(String username, String courseName, Long amountCompleted, String header) {
+        System.out.println("xxx0");
+        if(checkSelfOwner(header,username)){
+            System.out.println("xxx1");
+            Course course = getCourseByName(username,courseName,header);
+            if(course != null){
+                System.out.println("xxx3");
+                UserCourse userCourse = userCourseService.getUserCourse(username,courseName);
+                if(course.getDuration().longValue() == amountCompleted.longValue()){
+                    userCourse.setCompleted(true);
+                }
+                userCourse.setAmountCompleted(amountCompleted);
+                return userCourseRepository.save(userCourse);
+            }else{
+                System.out.println("xxx4");
+                throw new CanNotFoundUserCourseException();
+            }
+        }else {
+            System.out.println("xxx2");
+            throw new AccessPermissionDeniedException();
+        }
+    }
+
+
 }

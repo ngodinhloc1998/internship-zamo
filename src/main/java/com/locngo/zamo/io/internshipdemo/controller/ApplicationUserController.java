@@ -1,25 +1,20 @@
 package com.locngo.zamo.io.internshipdemo.controller;
 
-import com.locngo.zamo.io.internshipdemo.exception.APIException;
-import com.locngo.zamo.io.internshipdemo.exception.CustomRestExceptionHandler;
-import com.locngo.zamo.io.internshipdemo.exception.TestException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.locngo.zamo.io.internshipdemo.model.course.Course;
 import com.locngo.zamo.io.internshipdemo.model.userapplication.UserApplication;
 import com.locngo.zamo.io.internshipdemo.model.roleapplication.RoleApplication;
+import com.locngo.zamo.io.internshipdemo.model.usercourse.UserCourse;
 import com.locngo.zamo.io.internshipdemo.model.usersecurity.MyUserPrinciple;
 import com.locngo.zamo.io.internshipdemo.service.userapplication.service.UserApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.ApplicationContext;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +41,7 @@ public class ApplicationUserController {
         return userApplicationService.signup(userApplication);
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @RequestMapping(value = {"/apis/users/{id}"}, method = RequestMethod.GET)
     public @ResponseBody
     UserApplication getUserById(@PathVariable("id") Long id){
@@ -56,6 +52,7 @@ public class ApplicationUserController {
         }
     }
 
+    @PreAuthorize("hasAnyAuthority('ADMIN')")
     @RequestMapping(value = {"/apis/users"}, method = RequestMethod.GET)
     public @ResponseBody
     List<UserApplication> getUsers(){
@@ -65,6 +62,7 @@ public class ApplicationUserController {
             throw new RuntimeException(e.getMessage());
         }
     }
+
 
     @RequestMapping(value = {"/apis/users"},method = RequestMethod.PUT)
     public @ResponseBody
@@ -103,15 +101,6 @@ public class ApplicationUserController {
        return myUserPrinciple.loadUserByUsername(username);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN')")
-    @RequestMapping(value = "/apis/users/test/author-admin", method = RequestMethod.GET)
-    public @ResponseBody
-    String helloAdmin(){
-        Collection<SimpleGrantedAuthority> authentication = (Collection<SimpleGrantedAuthority>) SecurityContextHolder.getContext().getAuthentication().getAuthorities();
-        System.out.println(Arrays.toString(authentication.toArray()));
-        return "Hello Admin";
-    }
-
     @RequestMapping(value = "/apis/users/names-role/{username}",method = RequestMethod.GET)
     public @ResponseBody
     List<String> getNamesRole(@PathVariable String username){
@@ -119,12 +108,27 @@ public class ApplicationUserController {
     }
 
 
-    @RequestMapping(value = "/test-exception",method = RequestMethod.GET)
+    @RequestMapping(value = "/apis/users/add-course",method = RequestMethod.POST)
     public @ResponseBody
-    String testExceptionHandler(){
-        throw new TestException();
+    List<Course> addCourse(@RequestBody Map<String,String> userCourse,@RequestHeader("Authorization") String header){
+        String username = userCourse.get("username");
+        String courseName = userCourse.get("courseName");
+        return userApplicationService.addCourse(username,courseName,header);
     }
 
+    @RequestMapping(value = "/apis/users/{username}/courses",method = RequestMethod.GET)
+    public List<Course> getCourse(@PathVariable("username") String username,@RequestHeader("Authorization") String header){
+        return userApplicationService.getCourses(username,header);
+    }
+
+    @RequestMapping(value = "/apis/users/update-completed",method = RequestMethod.PUT)
+    public @ResponseBody
+    UserCourse updateAmountedCompleted(@RequestBody Map<String,Object> map,@RequestHeader("Authorization") String header){
+        String username = (String)map.get("username");
+        String courseName = (String)map.get("courseName");
+        Long number = (Long) Long.parseLong(String.valueOf(map.get("amountCompleted")));
+        return userApplicationService.updateAmountCompleted(username,courseName,number,header);
+    }
     /**
      * print all Bean
      */

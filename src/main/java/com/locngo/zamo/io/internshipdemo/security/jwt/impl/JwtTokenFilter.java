@@ -41,8 +41,9 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             SecurityContextHolder.clearContext();
             System.out.println("Expired or invalid token!");
             return;
+        }finally {
+            filterChain.doFilter(httpServletRequest,httpServletResponse);
         }
-        filterChain.doFilter(httpServletRequest,httpServletResponse);
     }
 
 }

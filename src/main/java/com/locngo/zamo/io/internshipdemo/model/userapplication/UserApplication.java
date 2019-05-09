@@ -2,16 +2,18 @@ package com.locngo.zamo.io.internshipdemo.model.userapplication;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.locngo.zamo.io.internshipdemo.model.roleapplication.UserRole;
+import com.locngo.zamo.io.internshipdemo.model.usercourse.UserCourse;
 import lombok.Data;
+import org.apache.catalina.User;
 import org.hibernate.annotations.Type;
 
 import javax.persistence.*;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Entity
 @Table(name = "user_application")
-@Data
 public class UserApplication {
 
     @Id
@@ -38,6 +40,11 @@ public class UserApplication {
     @MapsId("id")
     @JsonIgnore
     private Set<UserRole> userRole;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "userApplication")
+    @MapsId("id")
+    private Set<UserCourse> userCourses;
 
     public Long getId() {
         return id;
@@ -96,5 +103,16 @@ public class UserApplication {
 
     public void setUserRole(Set<UserRole> userRole) {
         this.userRole = userRole;
+    }
+
+    public Set<UserCourse> getUserCourses() {
+        if(userCourses == null || this.userCourses.size() == 0){
+            userCourses = new HashSet<UserCourse>();
+        }
+        return userCourses;
+    }
+
+    public void setUserCourses(Set<UserCourse> userCourses) {
+        this.userCourses = userCourses;
     }
 }
